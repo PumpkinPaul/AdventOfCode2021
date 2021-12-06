@@ -18,14 +18,8 @@
         //Look at each bit (MSB to LSB)
         for (var i = 0; i < bitCount; i++)
         {
-            int ones = 0;
-            int zeros = 0;
-
-            foreach (var line in lines)
-            {
-                if (line[i] == '0') zeros++;
-                else ones++;
-            }
+            var zeros = lines.Count(line => line[i] == '0');
+            var ones = lines.Length - zeros;
 
             //Set the bit if there are more ones; otherwise leave it unset as 0
             //e.g.
