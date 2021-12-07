@@ -22,12 +22,7 @@
     private static int Solve(string[] lines, Func<LineSegment, bool> predicate)
     {
         //Convert input into line segments
-        var lineSegments = new List<LineSegment>();
-        foreach (var line in lines)
-        {
-            var lineSegment = LineSegment.Parse(line);
-            lineSegments.Add(lineSegment);
-        }
+        var lineSegments = lines.Select(LineSegment.Parse);
 
         //Plot each point in each line segment
         var points = new Dictionary<Point, uint>();
