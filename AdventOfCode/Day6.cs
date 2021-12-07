@@ -5,22 +5,26 @@
         var lines = File.ReadAllLines("Input6.txt");
 
         Console.WriteLine("--- Day 6: Lanternfish ---");
-        Console.WriteLine($"Part1: {Part1(lines)}");
-        Console.WriteLine($"Part2: {Part2(lines)}");
+        Console.WriteLine($"Part1: {Part1(lines, 80)}");
+        Console.WriteLine($"Part2: {Part2(lines, 256)}");
     }
 
-    private static int Part1(string[] lines)
+    private static long Part1(string[] lines, int maxDays) => Solve(lines, maxDays);
+
+    private static long Part2(string[] lines, int maxDays) => Solve(lines, maxDays);
+    
+    private static long Solve(string[] lines, int maxDays)
     {
         var numbers = lines[0].Split(',').Select(int.Parse);
 
         //Just keep a track of the total number of fish at each age (we don't care about individual fish)
-        var ages = new int[9];
+        var ages = new long[9];
 
         foreach(var number in numbers)
             ages[number]++;
 
         //Process the number of days required
-        for (var day = 0; day < 80; day++)
+        for (var day = 0; day < maxDays; day++)
         {
             //How many new fish are required today?
             var spawnCount = ages[0];
@@ -34,10 +38,5 @@
         }
 
         return ages.Sum(a => a);
-    }
-
-    private static int Part2(string[] lines)
-    {
-        return 0;
     }
 }
