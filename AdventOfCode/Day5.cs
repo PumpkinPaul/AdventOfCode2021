@@ -14,10 +14,9 @@
         return Solve(lines, (lineSegment) => lineSegment.Start.X == lineSegment.End.X || lineSegment.Start.Y == lineSegment.End.Y);
     }
 
-
     private static int Part2(string[] lines)
     {
-        return Solve(lines, (lineSegment)=> true);
+        return Solve(lines, (lineSegment) => true);
     }
 
     private static int Solve(string[] lines, Func<LineSegment, bool> predicate)
