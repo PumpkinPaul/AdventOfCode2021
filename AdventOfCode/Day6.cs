@@ -5,13 +5,9 @@
         var lines = File.ReadAllLines("Input6.txt");
 
         Console.WriteLine("--- Day 6: Lanternfish ---");
-        Console.WriteLine($"Part1: {Part1(lines, 80)}");
-        Console.WriteLine($"Part2: {Part2(lines, 256)}");
+        Console.WriteLine($"Part1: {Solve(lines, 80)}");
+        Console.WriteLine($"Part2: {Solve(lines, 256)}");
     }
-
-    private static long Part1(string[] lines, int maxDays) => Solve(lines, maxDays);
-
-    private static long Part2(string[] lines, int maxDays) => Solve(lines, maxDays);
     
     private static long Solve(string[] lines, int maxDays)
     {
@@ -37,6 +33,6 @@
             ages[8] = spawnCount;  //Spawn the new 8s
         }
 
-        return ages.Sum(a => a);
+        return ages.Sum();
     }
 }

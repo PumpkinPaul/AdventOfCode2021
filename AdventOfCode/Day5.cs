@@ -5,18 +5,8 @@
         var lines = File.ReadAllLines("Input5.txt");
 
         Console.WriteLine("--- Day 5: Hydrothermal Venture ---");
-        Console.WriteLine($"Part1: {Part1(lines)}");
-        Console.WriteLine($"Part2: {Part2(lines)}");
-    }
-
-    private static int Part1(string[] lines)
-    {
-        return Solve(lines, (lineSegment) => lineSegment.Start.X == lineSegment.End.X || lineSegment.Start.Y == lineSegment.End.Y);
-    }
-
-    private static int Part2(string[] lines)
-    {
-        return Solve(lines, (lineSegment) => true);
+        Console.WriteLine($"Part1: {Solve(lines, (lineSegment) => lineSegment.Start.X == lineSegment.End.X || lineSegment.Start.Y == lineSegment.End.Y)}");
+        Console.WriteLine($"Part2: {Solve(lines, (lineSegment) => true)}");
     }
 
     private static int Solve(string[] lines, Func<LineSegment, bool> predicate)
