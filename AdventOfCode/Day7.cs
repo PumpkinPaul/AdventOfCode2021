@@ -40,7 +40,7 @@ public class Day7
         {
             for (var i = 0; i < maxSteps; i++)
             {
-                var difference = Math.Abs(positions[x] - i);                
+                var difference = Math.Abs(positions[x] - i - minPosition);                
                 costs[i] += costFunc(difference);
 
                 //Note - could store the cost for this difference as there may well be other crab submarines to
