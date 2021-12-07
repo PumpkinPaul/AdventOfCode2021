@@ -4,7 +4,7 @@
     {
         var lines = File.ReadAllLines("Input3.txt");
 
-        Console.WriteLine("RUNNING DAY #3");
+        Console.WriteLine("--- Day 3: Binary Diagnostic ---");
         Console.WriteLine($"Part1: {Part1(lines)}");
         Console.WriteLine($"Part2: {Part2(lines)}");
     }

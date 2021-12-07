@@ -5,7 +5,7 @@
         var lines = File.ReadAllLines("Input1.txt");
         var values = lines.Select(lines => int.Parse(lines)).ToArray();
 
-        Console.WriteLine("RUNNING DAY #1");
+        Console.WriteLine("--- Day 1: Sonar Sweep ---");
         Console.WriteLine($"Part1: {Part1(values)}");
         Console.WriteLine($"Part2: {Part2(values)}");
     }

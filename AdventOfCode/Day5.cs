@@ -4,7 +4,7 @@
     {
         var lines = File.ReadAllLines("Input5.txt");
 
-        Console.WriteLine($"RUNNING {nameof(Day5)}");
+        Console.WriteLine("--- Day 5: Hydrothermal Venture ---");
         Console.WriteLine($"Part1: {Part1(lines)}");
         Console.WriteLine($"Part2: {Part2(lines)}");
     }

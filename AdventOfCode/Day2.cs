@@ -5,7 +5,7 @@
         var lines = File.ReadAllLines("Input2.txt");
         var commands = lines.Select(line => new Command(line));
 
-        Console.WriteLine("RUNNING DAY #2");
+        Console.WriteLine("--- Day 2: Dive! ---");
         Console.WriteLine($"Part1: {Part1(commands)}");
         Console.WriteLine($"Part2: {Part2(commands)}");
     }
