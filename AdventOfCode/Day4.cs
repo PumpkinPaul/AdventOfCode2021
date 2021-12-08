@@ -52,6 +52,28 @@
         return 0;
     }
 
+    private static (IEnumerable<int> numbers, IEnumerable<Card> cards) SetupGame(string[] lines)
+    {
+        var numbers = lines[0].Split(',').Select(number => int.Parse(number));
+        var cards = new List<Card>();
+
+        var cardLines = new List<string>();
+        foreach (var line in lines.Skip(1))
+        {
+            if (string.IsNullOrEmpty(line))
+                continue;
+
+            cardLines.Add(line);
+            if (cardLines.Count == Card.ROWS)
+            {
+                cards.Add(new Card(cardLines));
+                cardLines.Clear();
+            }
+        }
+
+        return (numbers, cards);
+    }
+
     class Card
     {
         public const int ROWS = 5;
@@ -59,10 +81,13 @@
 
         //1d array of numbers row0: col0-4 => row1: col0-4, etc
         private readonly int[] _numbers;
+
+        //Initialise with all the numbers on the card and remove when they are marked
         private readonly HashSet<int> _unmarkedNumbers = new();
 
-        private readonly Dictionary<int, int> _markedRows = new();
-        private readonly Dictionary<int, int> _markedCols = new();
+        //A map of rows/cols with a count of marked numbers in each one - if the count in either gets to 5 we have a winner
+        private readonly Dictionary<int, int> _markedRows = new(); 
+        private readonly Dictionary<int, int> _markedCols = new(); 
 
         public int UnmarkedSum => _unmarkedNumbers.Sum();
 
@@ -91,52 +116,30 @@
 
             _unmarkedNumbers.Remove(number);
 
-            //Get the coordinates of the number
+            //Mark the row this number is in
             var row = index / ROWS;
-            var col = index % COLS;
+            MarkRowOrColContainsNumber(_markedRows, row);
 
-            if (_markedRows.ContainsKey(row) == false) 
-                _markedRows[row] = 0;
-
-            _markedRows[row] = _markedRows[row] + 1;
-
-            var winningRow = _markedRows.Where(r => r.Value == ROWS).Any();
-            if (winningRow)
+            if (_markedRows.Where(r => r.Value == ROWS).Any())
                 return true;
 
-            if (_markedCols.ContainsKey(col) == false)
-                _markedCols[col] = 0;
+            //Mark the column this number is in
+            var col = index % COLS;
+            MarkRowOrColContainsNumber(_markedCols, col);
 
-            _markedCols[col] = _markedCols[col] + 1;
-
-            var winningCol = _markedCols.Where(c => c.Value == COLS).Any();
-
-            if (winningCol)
+            if (_markedCols.Where(c => c.Value == COLS).Any())
                 return true;
 
             return false;
-        }
-    }
 
-    private static (IEnumerable<int> numbers, IEnumerable<Card> cards) SetupGame(string[] lines)
-    {
-        var numbers = lines[0].Split(',').Select(number => int.Parse(number));
-        var cards = new List<Card>();
-
-        var cardLines = new List<string>();
-        foreach (var line in lines.Skip(1))
-        {
-            if (string.IsNullOrEmpty(line))
-                continue;
-
-            cardLines.Add(line);
-            if (cardLines.Count == Card.ROWS)
+            static void MarkRowOrColContainsNumber(Dictionary<int, int> state, int key)
             {
-                cards.Add(new Card(cardLines));
-                cardLines.Clear();
+                //Mark this row as containing another number
+                if (state.ContainsKey(key) == false)
+                    state[key] = 0;
+
+                state[key] = state[key] + 1;
             }
         }
-
-        return (numbers, cards);
     }
 }
