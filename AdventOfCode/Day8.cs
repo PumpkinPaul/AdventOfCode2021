@@ -35,8 +35,8 @@
         foreach (var line in lines)
         {
             var parts = line.Split('|');
-            var signalValues = parts[0].Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(SortString);
-            var outputValues = parts[1].Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(SortString);
+            var signalValues = ParseCodedValues(parts[0]);
+            var outputValues = ParseCodedValues(parts[1]);
 
             var segments = new Dictionary<string, int>();
 
@@ -98,16 +98,19 @@
 
             //Add the total of this line to the grand total
             sum += int.Parse(result);
-
-            //Sort the characters in string e.g. defga => adefg
-            static string SortString(string input) => string.Concat(input.OrderBy(c => c));
-
-            //Returns true if input contains all of the characters in the mask
-            static bool ContainsAllChars(string input, string mask) => ContainsChars(input, mask, mask.Length);
-
-            //Returns true if input contains the specified number of characters in the mask
-            static bool ContainsChars(string input, string mask, int target) => target == mask.Count(c => input.Contains(c));
         }
+
+        //Returns a sequence of strings sorting each value in alphabetical order e.g. cda efa bad => adc aef abd
+        static IEnumerable<string> ParseCodedValues(string input) => input.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(SortString);
+
+        //Sort the characters in string e.g. defga => adefg
+        static string SortString(string input) => string.Concat(input.OrderBy(c => c));
+
+        //Returns true if input contains all of the characters in the mask
+        static bool ContainsAllChars(string input, string mask) => ContainsChars(input, mask, mask.Length);
+
+        //Returns true if input contains the specified number of characters in the mask
+        static bool ContainsChars(string input, string mask, int target) => target == mask.Count(c => input.Contains(c));
 
         return sum;
     }
