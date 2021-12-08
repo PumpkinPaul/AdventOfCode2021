@@ -18,9 +18,7 @@
         {
             foreach (var card in cards)
             {
-                card.MarkNumber(number);
-
-                if (card.IsWinner)
+                if (card.MarkNumber(number))
                     return number * card.UnmarkedSum;
             }
         }
@@ -39,9 +37,7 @@
         {
             foreach (var card in remainingCards)
             {
-                card.MarkNumber(number);
-
-                if (card.IsWinner)
+                if (card.MarkNumber(number))
                     winningCards.Add(card);
             }
 
@@ -63,12 +59,12 @@
 
         //1d array of numbers row0: col0-4 => row1: col0-4, etc
         private readonly int[] _numbers;
-        private readonly HashSet<int> _markedNumbers = new();
+        private readonly HashSet<int> _unmarkedNumbers = new();
 
         private readonly Dictionary<int, int> _markedRows = new();
         private readonly Dictionary<int, int> _markedCols = new();
 
-        public bool IsWinner { get; private set; }
+        public int UnmarkedSum => _unmarkedNumbers.Sum();
 
         public Card(IList<string> lines)
         {
@@ -81,16 +77,19 @@
             }
 
             _numbers = numbers.ToArray();
+
+            _unmarkedNumbers = _numbers.ToHashSet();
         }
 
-        public void MarkNumber(int number)
+        //Marks a number on the card if it exists - returns true if marking that number results in a winning card
+        public bool MarkNumber(int number)
         {
             //Only mark numbers that actually exist on this card
             var index = Array.IndexOf(_numbers, number);
             if (index == -1)
-                return;
+                return false;
 
-            _markedNumbers.Add(number);
+            _unmarkedNumbers.Remove(number);
 
             //Get the coordinates of the number
             var row = index / ROWS;
@@ -101,19 +100,22 @@
 
             _markedRows[row] = _markedRows[row] + 1;
 
+            var winningRow = _markedRows.Where(r => r.Value == ROWS).Any();
+            if (winningRow)
+                return true;
+
             if (_markedCols.ContainsKey(col) == false)
                 _markedCols[col] = 0;
 
             _markedCols[col] = _markedCols[col] + 1;
 
-            var winningRow = _markedRows.Where(r => r.Value == ROWS).Any();
             var winningCol = _markedCols.Where(c => c.Value == COLS).Any();
 
-            if (winningRow || winningCol)
-                IsWinner = true;
-        }
+            if (winningCol)
+                return true;
 
-        public int UnmarkedSum => _numbers.Where(n => !_markedNumbers.Contains(n)).Sum();
+            return false;
+        }
     }
 
     private static (IEnumerable<int> numbers, IEnumerable<Card> cards) SetupGame(string[] lines)
