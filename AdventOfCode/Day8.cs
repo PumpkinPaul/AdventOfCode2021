@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-public class Day8
+﻿public class Day8
 {
     public static void Run()
     {
@@ -8,8 +6,8 @@ public class Day8
 
         Console.WriteLine("--- Day 8: Seven Segment Search ---");
 
-        Console.WriteLine($"Part1: {Part1(lines)}");
-        Console.WriteLine($"Part2: {Part2(lines)}");
+        Console.WriteLine($"Part1: {Part1(lines)}"); //274
+        Console.WriteLine($"Part2: {Part2(lines)}"); //1012089
     }
 
     private static long Part1(string[] lines)
@@ -28,6 +26,12 @@ public class Day8
     private static long Part2(string[] lines)
     {
         var sum = 0;
+
+        //Process each line one at a time
+        //First parse the line to get the signals and the output values
+        //Next decode the signals so that we know what number each alpha block of chars is
+        //Finally use the decoded signal values to decode the output values summing the results as we go
+
         foreach (var line in lines)
         {
             var parts = line.Split('|');
@@ -37,7 +41,6 @@ public class Day8
             var segments = new Dictionary<string, int>();
 
             //Decode the signal to work out what number each alpha value is
-
             var zero = "";
             var one = "";
             var two = "";
@@ -48,11 +51,10 @@ public class Day8
             var seven = "";
             var eight = "";
             var nine = "";
+
+            //1, 4, 7, 8 are numbers with a unique number of segments
             foreach (var value in signalValues)
             {
-                //1, 4, 7, 8 are numbers with a unique number of segments
-                //Using 1 we can work out what the top bit of 7 is
-
                 if (value.Length == 2)
                     one = SortString(value);
                 else if (value.Length == 3)
@@ -63,6 +65,8 @@ public class Day8
                     eight = SortString(value);
             }
 
+            //0, 6, 9 all have 6 characters - we can compare the segments to known numbers above to work them out
+            //I'm sure we could probably use a mask here
             foreach (var value in signalValues)
             {
                 if (value.Length == 6)
@@ -76,6 +80,9 @@ public class Day8
                 }
             }
 
+            //2, 3, 5 all have 5 characters - we can compare the segments to known numbers above to work them out
+            //5 and 2 are tricky, however. There's not a unique mask
+            //5 does look mostly like a 6 though, with one fewer segment - use that knowledge to set it - the remaining number must be 2 then
             foreach (var value in signalValues)
             {
                 if (value.Length == 5)
@@ -89,7 +96,12 @@ public class Day8
                 }
             }
 
-            //Now decode the output values
+            //Now decode the output values for this line
+            //Concatenate each decoded alpha sequence number to the result and simply convert to a number once the block of 4 values hass been processed
+            //e.g. (using example data)
+            //abc df abcefg abc
+            //  4  1      6   4
+            //= 4164
             var result = "";
             foreach (var value in outputValues)
             {
@@ -107,6 +119,7 @@ public class Day8
                 else if (orderedValue == nine) result += "9";
             }
 
+            //Add the total of this line to the grand total
             sum += int.Parse(result);
 
             static string SortString(string input)
