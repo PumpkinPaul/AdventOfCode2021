@@ -35,34 +35,26 @@
         foreach (var line in lines)
         {
             var parts = line.Split('|');
-            var signalValues = parts[0].Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            var outputValues = parts[1].Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var signalValues = parts[0].Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(SortString);
+            var outputValues = parts[1].Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(SortString);
 
             var segments = new Dictionary<string, int>();
 
             //Decode the signal to work out what number each alpha value is
-            var zero = "";
-            var one = "";
-            var two = "";
-            var three = "";
-            var four = "";
-            var five = "";
-            var six = "";
-            var seven = "";
-            var eight = "";
-            var nine = "";
+            var decodedSignalValues = new string[10];
 
             //1, 4, 7, 8 are numbers with a unique number of segments
             foreach (var value in signalValues)
             {
                 if (value.Length == 2)
-                    one = SortString(value);
+                    //one = value;
+                    decodedSignalValues[1] = value;
                 else if (value.Length == 3)
-                    seven = SortString(value);
+                    decodedSignalValues[7] = value;
                 else if (value.Length == 4)
-                    four = SortString(value);
+                    decodedSignalValues[4] = value;
                 else if (value.Length == 7)
-                    eight = SortString(value);
+                    decodedSignalValues[8] = value;
             }
 
             //0, 6, 9 all have 6 characters - we can compare the segments to known numbers above to work them out
@@ -71,12 +63,12 @@
             {
                 if (value.Length == 6)
                 {
-                    if (ContainsAllChars(value, four))
-                        nine = SortString(value);
-                    else if (ContainsAllChars(value, seven))
-                        zero = SortString(value);
+                    if (ContainsAllChars(value, decodedSignalValues[4]))
+                        decodedSignalValues[9] = value;
+                    else if (ContainsAllChars(value, decodedSignalValues[7]))
+                        decodedSignalValues[0] = value;
                     else
-                        six = SortString(value);
+                        decodedSignalValues[6] = value;
                 }
             }
 
@@ -87,37 +79,22 @@
             {
                 if (value.Length == 5)
                 {
-                    if (ContainsAllChars(value, seven))
-                        three = SortString(value);
-                    else if (ContainsChars(value, six, six.Length - 1))
-                        five = SortString(value);
+                    if (ContainsAllChars(value, decodedSignalValues[7]))
+                        decodedSignalValues[3] = value;
+                    else if (ContainsChars(value, decodedSignalValues[6], decodedSignalValues[6].Length - 1))
+                        decodedSignalValues[5] = value;
                     else
-                        two = SortString(value);
+                        decodedSignalValues[2] = value;
                 }
             }
 
             //Now decode the output values for this line
-            //Concatenate each decoded alpha sequence number to the result and simply convert to a number once the block of 4 values hass been processed
+            //Join each decoded alpha sequence number value to the result and simply convert to a number once the block of 4 values hass been processed
             //e.g. (using example data)
             //abc df abcefg abc
             //  4  1      6   4
             //= 4164
-            var result = "";
-            foreach (var value in outputValues)
-            {
-                var orderedValue = SortString(value);
-
-                if (orderedValue == zero) result += "0";
-                else if (orderedValue == one) result += "1";
-                else if (orderedValue == two) result += "2";
-                else if (orderedValue == three) result += "3";
-                else if (orderedValue == four) result += "4";
-                else if (orderedValue == five) result += "5";
-                else if (orderedValue == six) result += "6";
-                else if (orderedValue == seven) result += "7";
-                else if (orderedValue == eight) result += "8";
-                else if (orderedValue == nine) result += "9";
-            }
+            var result = string.Join("", outputValues.Select(value => Array.IndexOf(decodedSignalValues, value).ToString()));
 
             //Add the total of this line to the grand total
             sum += int.Parse(result);
