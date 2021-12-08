@@ -30,9 +30,10 @@
     {
         var (numbers, cards) = SetupGame(lines);
 
-        //Play bingo
         var remainingCards = new List<Card>(cards);
         var winningCards = new List<Card>();
+
+        //Play bingo
         foreach (var number in numbers)
         {
             foreach (var card in remainingCards)
