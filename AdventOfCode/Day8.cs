@@ -106,28 +106,11 @@
                 return new string(characters);
             }
 
-            static bool ContainsAllChars(string input, string mask)
-            {
-                foreach (var c in mask)
-                {
-                    if (input.Contains(c) == false)
-                        return false;
-                }
+            //Returns true if input contains all of the characters in the mask
+            static bool ContainsAllChars(string input, string mask) => ContainsChars(input, mask, mask.Length);
 
-                return true;
-            }
-
-            static bool ContainsChars(string input, string mask, int target)
-            {
-                var matched = 0;
-                foreach (var c in mask)
-                {
-                    if (input.Contains(c))
-                        matched++;
-                }
-
-                return matched == target;
-            }
+            //Returns true if input contains the specified number of characters in the mask
+            static bool ContainsChars(string input, string mask, int target) => target == mask.Count(c => input.Contains(c));
         }
 
         return sum;
