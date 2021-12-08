@@ -99,12 +99,8 @@
             //Add the total of this line to the grand total
             sum += int.Parse(result);
 
-            static string SortString(string input)
-            {
-                var characters = input.ToCharArray();
-                Array.Sort(characters);
-                return new string(characters);
-            }
+            //Sort the characters in string e.g. defga => adefg
+            static string SortString(string input) => string.Concat(input.OrderBy(c => c));
 
             //Returns true if input contains all of the characters in the mask
             static bool ContainsAllChars(string input, string mask) => ContainsChars(input, mask, mask.Length);
