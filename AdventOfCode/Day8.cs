@@ -52,8 +52,11 @@
                     decodedSignalValues[number] = value;
             }
 
-            //0, 6, 9 all have 6 characters - we can compare the segments to known numbers above to work them out
-            //I'm sure we could probably use a mask here
+            //0, 6, 9 all have 6 characters - we compare these characters to previously set numbers
+            //e.g.
+            //9 contains all the segments from a 4. 0 or 6 don't so that means it must be a match
+            //0 contains all the segments from a 7. 6 doesn't so that means it must be a match
+            //we are left with 6 as the only other letter with 6 chars
             foreach (var value in signalValues.Where(value => value.Length == 6))
             {
                 if (ContainsAllChars(value, decodedSignalValues[4]))
@@ -64,7 +67,7 @@
                     decodedSignalValues[6] = value;
             }
 
-            //2, 3, 5 all have 5 characters - we can compare the segments to known numbers above to work them out
+            //2, 3, 5 all have 5 characters - we compare these characters to previously set numbers
             //5 and 2 are tricky, however. There's not a unique mask
             //5 does look mostly like a 6 though, with one fewer segment - use that knowledge to set it - the remaining number must be 2 then
             foreach (var value in signalValues.Where(value => value.Length == 5))
