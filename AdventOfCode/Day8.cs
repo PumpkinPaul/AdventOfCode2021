@@ -43,49 +43,38 @@
             //Decode the signal to work out what number each alpha value is
             var decodedSignalValues = new string[10];
 
-            //1, 4, 7, 8 are numbers with a unique number of segments
+            //1, 4, 7, 8 are numbers with a unique number of segments - create a map of segment count to the corresponding number
+            var segmentCountNumberMap = new Dictionary<int, int> { { 2, 1 }, { 3, 7 }, { 4, 4 }, { 7, 8 } };
+
             foreach (var value in signalValues)
             {
-                if (value.Length == 2)
-                    //one = value;
-                    decodedSignalValues[1] = value;
-                else if (value.Length == 3)
-                    decodedSignalValues[7] = value;
-                else if (value.Length == 4)
-                    decodedSignalValues[4] = value;
-                else if (value.Length == 7)
-                    decodedSignalValues[8] = value;
+                if (segmentCountNumberMap.TryGetValue(value.Length, out int number))
+                    decodedSignalValues[number] = value;
             }
 
             //0, 6, 9 all have 6 characters - we can compare the segments to known numbers above to work them out
             //I'm sure we could probably use a mask here
-            foreach (var value in signalValues)
+            foreach (var value in signalValues.Where(value => value.Length == 6))
             {
-                if (value.Length == 6)
-                {
-                    if (ContainsAllChars(value, decodedSignalValues[4]))
-                        decodedSignalValues[9] = value;
-                    else if (ContainsAllChars(value, decodedSignalValues[7]))
-                        decodedSignalValues[0] = value;
-                    else
-                        decodedSignalValues[6] = value;
-                }
+                if (ContainsAllChars(value, decodedSignalValues[4]))
+                    decodedSignalValues[9] = value;
+                else if (ContainsAllChars(value, decodedSignalValues[7]))
+                    decodedSignalValues[0] = value;
+                else
+                    decodedSignalValues[6] = value;
             }
 
             //2, 3, 5 all have 5 characters - we can compare the segments to known numbers above to work them out
             //5 and 2 are tricky, however. There's not a unique mask
             //5 does look mostly like a 6 though, with one fewer segment - use that knowledge to set it - the remaining number must be 2 then
-            foreach (var value in signalValues)
+            foreach (var value in signalValues.Where(value => value.Length == 5))
             {
-                if (value.Length == 5)
-                {
-                    if (ContainsAllChars(value, decodedSignalValues[7]))
-                        decodedSignalValues[3] = value;
-                    else if (ContainsChars(value, decodedSignalValues[6], decodedSignalValues[6].Length - 1))
-                        decodedSignalValues[5] = value;
-                    else
-                        decodedSignalValues[2] = value;
-                }
+                if (ContainsAllChars(value, decodedSignalValues[7]))
+                    decodedSignalValues[3] = value;
+                else if (ContainsChars(value, decodedSignalValues[6], decodedSignalValues[6].Length - 1))
+                    decodedSignalValues[5] = value;
+                else
+                    decodedSignalValues[2] = value;
             }
 
             //Now decode the output values for this line
