@@ -5,7 +5,18 @@
         var lines = File.ReadAllLines("Input5.txt");
 
         Console.WriteLine("--- Day 5: Hydrothermal Venture ---");
+
+        //====================================================================================================
+        //Consider only horizontal and vertical lines.
+        //At how many points do at least two lines overlap?
+        //====================================================================================================
+
         Console.WriteLine($"Part1: {Solve(lines, (lineSegment) => lineSegment.Start.X == lineSegment.End.X || lineSegment.Start.Y == lineSegment.End.Y)}");
+
+        //====================================================================================================
+        //Consider all of the lines.
+        //At how many points do at least two lines overlap?
+        //====================================================================================================
         Console.WriteLine($"Part2: {Solve(lines, (lineSegment) => true)}");
     }
 

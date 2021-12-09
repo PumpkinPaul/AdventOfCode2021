@@ -60,6 +60,10 @@
 
     private static long Part1(string[] lines)
     {
+        //====================================================================================================
+        //What is the sum of the risk levels of all low points on your heightmap?
+        //====================================================================================================
+
         var heights = LoadArray(lines);
 
         return GetLowPoints(heights)
@@ -70,6 +74,10 @@
 
     private static long Part2(string[] lines)
     {
+        //====================================================================================================
+        //What do you get if you multiply together the sizes of the three largest basins?
+        //====================================================================================================
+
         var heights = LoadArray(lines);
 
         var lowPoints = GetLowPoints(heights);

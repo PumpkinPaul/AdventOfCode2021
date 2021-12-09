@@ -11,6 +11,11 @@
 
     private static int Part1(string[] lines)
     {
+        //====================================================================================================
+        //To guarantee victory against the giant squid, figure out which board will win first.
+        //What will your final score be if you choose that board?
+        //====================================================================================================
+
         var (numbers, cards) = SetupGame(lines);
 
         //Play bingo
@@ -28,6 +33,11 @@
 
     private static int Part2(string[] lines)
     {
+        //====================================================================================================
+        //Figure out which board will win last.
+        //Once it wins, what would its final score be?
+        //====================================================================================================
+
         var (numbers, cards) = SetupGame(lines);
 
         var remainingCards = new List<Card>(cards);

@@ -5,7 +5,16 @@
         var lines = File.ReadAllLines("Input6.txt");
 
         Console.WriteLine("--- Day 6: Lanternfish ---");
+
+        //====================================================================================================
+        //Find a way to simulate lanternfish.
+        //How many lanternfish would there be after 80 days?
+        //====================================================================================================
         Console.WriteLine($"Part1: {Solve(lines, 80)}");
+
+        //====================================================================================================
+        //How many lanternfish would there be after 256 days?
+        //====================================================================================================
         Console.WriteLine($"Part2: {Solve(lines, 256)}");
     }
     

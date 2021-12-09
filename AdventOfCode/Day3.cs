@@ -11,6 +11,10 @@
 
     private static int Part1(string[] lines)
     {
+        //====================================================================================================
+        //What is the power consumption of the submarine?
+        //====================================================================================================
+
         var bitCount = lines[0].Length;     //Total number of bits in each input - e.g. 10101 = 5 bits of data
         var maxValue = (1 << bitCount) - 1; //The maximum value of a line if all bits are 1 - e.g. 11111 (used to find epsilon from gamma)
         int gamma = 0;
@@ -36,6 +40,10 @@
 
     private static int Part2(string[] lines)
     {
+        //====================================================================================================
+        //What is the life support rating of the submarine?
+        //====================================================================================================
+
         var oxygen = GetValue(lines, (zeros, ones) => ones >= zeros ? '1' : '0');
         var c02 = GetValue(lines, (zeros, ones) => zeros <= ones ? '0' : '1');
 

@@ -2,15 +2,26 @@
 {
     public static void Run()
     {
-        var test = new[] { "16,1,2,0,4,2,7,1,2,14" };
-        var lines = File.ReadAllLines("Input7.txt");
-
+        
         Console.WriteLine("--- Day 7: The Treachery of Whales ---");
 
-        Console.WriteLine($"Test1: {Solve(test, SimpleCost)}");    //37
-        Console.WriteLine($"Test2: {Solve(test, CompoundCost)}");  //168        
+        //var test = new[] { "16,1,2,0,4,2,7,1,2,14" };
+        //Console.WriteLine($"Test1: {Solve(test, SimpleCost)}");    //37
+        //Console.WriteLine($"Test2: {Solve(test, CompoundCost)}");  //168        
 
+        var lines = File.ReadAllLines("Input7.txt");
+
+        //====================================================================================================
+        //Determine the horizontal position that the crabs can align to using the least fuel possible.
+        //How much fuel must they spend to align to that position?
+        //====================================================================================================
         Console.WriteLine($"Part1: {Solve(lines, SimpleCost)}");   //342730
+
+        //====================================================================================================
+        //Determine the horizontal position that the crabs can align to using the
+        //least fuel possible so they can make you an escape route!
+        //How much fuel must they spend to align to that position?
+        //====================================================================================================
         Console.WriteLine($"Part2: {Solve(lines, CompoundCost)}"); //92335207
 
         //Simple cost is the difference between the two horizontal positions

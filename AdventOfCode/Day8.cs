@@ -12,6 +12,10 @@
 
     private static long Part1(string[] lines)
     {
+        //====================================================================================================
+        //In the output values, how many times do digits 1, 4, 7, or 8 appear?
+        //====================================================================================================
+
         //We need to count instances of the following numbers 1, 4, 7, 8 - these are easy as they have a unique number of segments used to make them
         //2 segments make the number 1
         //4 segments make the number 4
@@ -30,6 +34,12 @@
 
     private static long Part2(string[] lines)
     {
+        //====================================================================================================
+        //For each entry, determine all of the wire/segment connections and decode
+        //the four-digit output values.
+        //What do you get if you add up all of the output values?
+        //====================================================================================================
+
         //Process each line one at a time
         //First parse the line to get the signals and the output values
         //Next decode the signals so that we know what number each alpha block of chars is

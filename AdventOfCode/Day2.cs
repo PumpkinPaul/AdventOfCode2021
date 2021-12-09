@@ -26,6 +26,10 @@
 
     private static int Part1(IEnumerable<Command> commands)
     {
+        //====================================================================================================
+        //What do you get if you multiply your final horizontal position by your final depth?
+        //====================================================================================================
+
         var position = 0;
         var depth = 0;
 
@@ -52,6 +56,9 @@
 
     private static int Part2(IEnumerable<Command> commands)
     {
+        //====================================================================================================
+        //What do you get if you multiply your final horizontal position by your final depth?
+        //====================================================================================================
         var position = 0;
         var depth = 0;
         var aim = 0;
