@@ -117,13 +117,7 @@
             } while (locationsToCheck.Count > 0);
         }
 
-        var total = 1;
-        var b = basins.OrderByDescending(b => b.Count);
-
-        foreach (var basin in basins.OrderByDescending(b => b.Count).Take(3))
-            total *= basin.Count;
-
-        return total;
+        return basins.OrderByDescending(b => b.Count).Take(3).Aggregate(1, (a, b) => a * b.Count);
     }
 
     private readonly record struct Location(int Row, int Col, int Height);
