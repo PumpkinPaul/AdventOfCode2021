@@ -12,12 +12,17 @@
 
     private static long Part1(string[] lines)
     {
-        //A count of the number of segments for the numbers we are interested in counting (1, 4, 7, 8)
+        //We need to count instances of the following numbers 1, 4, 7, 8 - these are easy as they have a unique number of segments used to make them
+        //2 segments make the number 1
+        //4 segments make the number 4
+        //3 segments make the number 7
+        //7 segments make the number 8
         var sevenSegmentDigits = new HashSet<int> { { 2 }, { 4 }, { 3 }, { 7 } };
 
         return lines
             .SelectMany(ParseOutputValues)
-            .Count(value => sevenSegmentDigits.Contains(value.Length));
+            .Select(value => value.Length)
+            .Count(sevenSegmentDigits.Contains);
 
         static IEnumerable<string> ParseOutputValues(string line) =>
             line.Split('|')[1].Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -25,20 +30,18 @@
 
     private static long Part2(string[] lines)
     {
-        var sum = 0;
-
         //Process each line one at a time
         //First parse the line to get the signals and the output values
         //Next decode the signals so that we know what number each alpha block of chars is
         //Finally use the decoded signal values to decode the output values summing the results as we go
+
+        var sum = 0;
 
         foreach (var line in lines)
         {
             var parts = line.Split('|');
             var signalValues = ParseCodedValues(parts[0]);
             var outputValues = ParseCodedValues(parts[1]);
-
-            var segments = new Dictionary<string, int>();
 
             //Decode the signal to work out what number each alpha value is
             var decodedSignalValues = new string[10];
