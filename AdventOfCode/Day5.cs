@@ -33,29 +33,10 @@
         return points.Values.Count(count => count >= 2);
     }
 
-    private readonly struct Point
+    private readonly record struct Point(int X, int Y);
+
+    private readonly record struct LineSegment(Point Start, Point End)
     {
-        public readonly int X;
-        public readonly int Y;
-
-        public Point(int x, int y)
-        {
-            X = x;
-            Y = y;
-        }
-    }
-
-    private class LineSegment
-    {
-        public readonly Point Start;
-        public readonly Point End;
-
-        public LineSegment(Point start, Point end)
-        {
-            Start = start;
-            End = end;
-        }
-
         public static LineSegment Parse(string line)
         {
             //Line is in the following format

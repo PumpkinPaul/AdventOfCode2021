@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-public class Day7
+﻿public class Day7
 {
     public static void Run()
     {
