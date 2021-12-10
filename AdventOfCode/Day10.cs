@@ -86,6 +86,7 @@ public class Day10
                 //Any incomplete lines? These are lines that are not corrupted or complete
                 if (isLineCorrupted || expectedEndChars.Count == 0) return;
 
+                //This line is incomplete so calculate the score
                 var lineScore = 0L;
                 while (expectedEndChars.Count > 0)
                     lineScore = lineScore * 5 + _charScores[expectedEndChars.Pop()];
@@ -94,6 +95,7 @@ public class Day10
             }
         ); 
 
+        //Result is the middle score in the list of incomplete scores
         return incompleteLineScores
             .OrderBy(s => s)
             .ElementAt((int)Math.Ceiling((double)(incompleteLineScores.Count / 2)));
