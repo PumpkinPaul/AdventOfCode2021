@@ -12,7 +12,7 @@ public class Day10
 
         var lines = File.ReadAllLines("Input10.txt");
         Console.WriteLine($"Part1: {Part1(lines)}"); //392421
-        Console.WriteLine($"Part2: {Part2(lines)}"); //
+        Console.WriteLine($"Part2: {Part2(lines)}"); //2769449099
     }
 
     private static readonly ReadOnlyDictionary<char, char> _chunks = new(new Dictionary<char, char>() {
@@ -38,9 +38,78 @@ public class Day10
 
         var errors = _chunks.Values.ToDictionary(key => key, value => 0);
 
+        ProcessLines(
+            lines,
+            //Line preprocessor: called at the start of each line process
+            null,
+
+            //Illegal character processor: called when an illegale end character is found
+            (c) => errors[c] += 1,
+
+            //Line postprocessor: called when all of the characters in a line have been processed
+            null);
+
+        return errors
+            .Select(error => error.Value * _errorCosts[error.Key])
+            .Sum();
+    }
+
+    private static long Part2(string[] lines)
+    {
+        //====================================================================================================
+        //Find the completion string for each incomplete line, score the completion strings, and sort the scores.
+        //What is the middle score?
+        //====================================================================================================
+
+        //The score for each missing closing character in incomplete lines
+        var _charScores = new Dictionary<char, int> {
+            { ')', 1 },
+            { ']', 2 },
+            { '}', 3 },
+            { '>', 4 }
+        };
+
+        var incompleteLineScores = new List<long>();
+
+        var isLineCorrupted = false;
+
+        ProcessLines(
+            lines,
+            //Line preprocessor: called at the start of each line process
+            (line) => isLineCorrupted = false,
+
+            //Illegal character processor: called when an illegale end character is found
+            (c) => isLineCorrupted = true,
+            
+            //Line postprocessor: called when all of the characters in a line have been processed
+            (line, expectedEndChars) => {
+                //Any incomplete lines? These are lines that are not corrupted or complete
+                if (isLineCorrupted || expectedEndChars.Count == 0) return;
+
+                var lineScore = 0L;
+                while (expectedEndChars.Count > 0)
+                    lineScore = lineScore * 5 + _charScores[expectedEndChars.Pop()];
+
+                incompleteLineScores.Add(lineScore);
+            }
+        ); 
+
+        return incompleteLineScores
+            .OrderBy(s => s)
+            .ElementAt((int)Math.Ceiling((double)(incompleteLineScores.Count / 2)));
+    }
+
+    private static void ProcessLines(
+        string[] lines,
+        Action<string>? linePreProcessor,
+        Action<char> corruptedCharProcessor,
+        Action<string, Stack<char>>? linePostProcessor)
+    {
         //Iterate the line, lookup the expected closing char from the opening char and add to the stack.
         foreach (var line in lines)
         {
+            linePreProcessor?.Invoke(line);
+
             var expectedEndChars = new Stack<char>();
 
             foreach (var c in line)
@@ -56,69 +125,12 @@ public class Day10
                 //It's a closing char but is it the expected one
                 if (c == expectedEndChars.Pop()) continue;
 
-                //Found a corrupted char! Log it as an error
-                errors[c] += 1;
-                break;
-            }
-        }
-
-        return errors
-            .Select(error => error.Value * _errorCosts[error.Key])
-            .Sum();
-    }
-
-    private static long Part2(string[] lines)
-    {
-        //====================================================================================================
-        //Find the completion string for each incomplete line, score the completion strings, and sort the scores.
-        //What is the middle score?
-        //====================================================================================================
-
-        var _charScores = new Dictionary<char, int> {
-            { ')', 1 },
-            { ']', 2 },
-            { '}', 3 },
-            { '>', 4 }
-        };
-
-        var incompleteLineScores = new List<long>();
-
-        //Iterate the line, lookup the expected closing char from the opening char and add to the stack.
-        foreach (var line in lines)
-        {
-            var isLineCorrupted = false;
-            var expectedEndChars = new Stack<char>();
-
-            foreach (var c in line)
-            {
-                //Determine if the char is opening or closing 
-                if (_chunks.ContainsKey(c))
-                {
-                    //It's an opening char so expect the corresponding closing char
-                    expectedEndChars.Push(_chunks[c]);
-                    continue;
-                }
-
-                //It's a closing char but is it the expected one?
-                if (c == expectedEndChars.Pop()) continue;
-
-                //Found a corrupted char! Flaf the line as an error
-                isLineCorrupted = true;
+                //Found a corrupted char! Process it!
+                corruptedCharProcessor(c);
                 break;
             }
 
-            //Any incomplete lines?
-            if (isLineCorrupted || expectedEndChars.Count <= 0) continue;
-
-            var lineScore = 0L;
-            while (expectedEndChars.Count > 0)
-                lineScore = lineScore * 5 + _charScores[expectedEndChars.Pop()];
-            
-            incompleteLineScores.Add(lineScore);
+            linePostProcessor?.Invoke(line, expectedEndChars);
         }
-
-        return incompleteLineScores
-            .OrderBy(s => s)
-            .ElementAt((int)Math.Ceiling((double)(incompleteLineScores.Count / 2)));
     }
 }
