@@ -1,7 +1,7 @@
 ﻿public class Day9
 {
     public static void Run()
-    {        
+    {
         Console.WriteLine("--- Day 9: Smoke Basin ---");
 
         //var test = File.ReadAllLines("Test9.txt");
@@ -15,37 +15,33 @@
 
     private static int[][] LoadArray(string[] lines)
     {
-        //We assume the input data is good and all lines have the same length
+        //We will pad the array with a border of 9's to make the adjacent lookups simpler
+        var width = lines[0].Length;
+        var lineOfNines = new string('9', width);
+
+        lines = lines.Prepend(lineOfNines).Append(lineOfNines).ToArray();
 
         var heights = new int[lines.Length][];
-        for (int i = 0; i < lines.Length; i++)
-            heights[i] = lines[i].ToCharArray().Select(c => (int)char.GetNumericValue(c)).ToArray();
+
+        for (var i = 0; i < lines.Length; i++)
+            heights[i] = $"9{lines[i]}9".ToCharArray().Select(c => (int)char.GetNumericValue(c)).ToArray();
 
         return heights;
     }
 
     static IEnumerable<Location> GetAdjacentLocations(int[][] heights, int row, int col)
     {
-        if (row > 0)
-            yield return new Location(row - 1, col, heights[row - 1][col]); //above
-
-        if (row < heights.Length - 1)
-            yield return new Location(row + 1, col, heights[row + 1][col]); //below
-
-        if (col > 0)
-            yield return new Location(row, col - 1, heights[row][col - 1]); //left
-
-        if (col < heights[0].Length - 1)
-            yield return new Location(row, col + 1, heights[row][col + 1]); //right
+        return new[] { new { r = 1, c = 0 }, new { r = -1, c = 0 }, new { r = 0, c = 1 }, new { r = 0, c = -1 } }
+            .Select(p => new Location(row + p.r, col + p.c, heights[row + p.r][col + p.c]));
     }
 
     private static IEnumerable<Location> GetLowPoints(int[][] heights)
     {
         var lowPoints = new List<int>();
 
-        for (var r = 0; r < heights.Length; r++)
+        for (var r = 1; r < heights.Length - 1; r++)
         {
-            for (var c = 0; c < heights[r].Length; c++)
+            for (var c = 1; c < heights[r].Length - 1; c++)
             {
                 //Check adjacent locations
                 var adjacentLocations = GetAdjacentLocations(heights, r, c).Select(l => l.Height);
@@ -86,7 +82,7 @@
         var basins = new List<List<Location>>();
 
         //Start at the lowpoint and move up in heights
-        foreach(var lowPoint in lowPoints)
+        foreach (var lowPoint in lowPoints)
         {
             var basin = new List<Location> { lowPoint };
             basins.Add(basin);
@@ -101,10 +97,10 @@
             do
             {
                 var location = locationsToCheck.Dequeue();
-                
+
                 //Check adjacent height
                 var adjacentLocations = GetAdjacentLocations(heights, location.Row, location.Col)
-                    .Where(adjacent => 
+                    .Where(adjacent =>
                         checkedLocations.Contains(adjacent) == false
                         && adjacent.Height > location.Height
                         && adjacent.Height != 9);
