@@ -29,7 +29,7 @@
         return heights;
     }
 
-    static IEnumerable<Location> GetAdjacentLocations(int[][] heights, int row, int col)
+    private static IEnumerable<Location> GetAdjacentLocations(int[][] heights, int row, int col)
     {
         return new[] { new { r = 1, c = 0 }, new { r = -1, c = 0 }, new { r = 0, c = 1 }, new { r = 0, c = -1 } }
             .Select(p => new Location(row + p.r, col + p.c, heights[row + p.r][col + p.c]));
@@ -79,13 +79,12 @@
         var lowPoints = GetLowPoints(heights);
 
         //Create a basin for each lowpoint
-        var basins = new List<List<Location>>();
+        var basins = new List<int>();
 
         //Start at the lowpoint and move up in heights
         foreach (var lowPoint in lowPoints)
         {
-            var basin = new List<Location> { lowPoint };
-            basins.Add(basin);
+            var basin = 1;
 
             //Now flood fill from these starting points getting locations where the heights are one more
             var locationsToCheck = new Queue<Location>();
@@ -106,17 +105,19 @@
                         && adjacent.Height != 9);
 
                 //These adjacent heights are in the basin!
-                basin.AddRange(adjacentLocations);
+                basin += adjacentLocations.Count();
                 locationsToCheck.AddRange(adjacentLocations);
                 checkedLocations.AddRange(adjacentLocations);
 
             } while (locationsToCheck.Count > 0);
+
+            basins.Add(basin);
         }
 
         return basins
-            .OrderByDescending(b => b.Count)
+            .OrderByDescending(b => b)
             .Take(3)
-            .Aggregate(1, (a, b) => a * b.Count);
+            .Aggregate(1, (a, b) => a * b);
     }
 
     private readonly record struct Location(int Row, int Col, int Height);
