@@ -98,7 +98,7 @@ public class Day10
         //Result is the middle score in the list of incomplete scores
         return incompleteLineScores
             .OrderBy(s => s)
-            .ElementAt((int)Math.Ceiling((double)(incompleteLineScores.Count / 2)));
+            .ElementAt((incompleteLineScores.Count / 2));
     }
 
     private static void ProcessLines(
