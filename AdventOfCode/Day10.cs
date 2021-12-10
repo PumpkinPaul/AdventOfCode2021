@@ -62,12 +62,12 @@ public class Day10
         //====================================================================================================
 
         //The score for each missing closing character in incomplete lines
-        var _charScores = new Dictionary<char, int> {
+        var _charScores = new ReadOnlyDictionary<char, int>(new Dictionary<char, int>() {
             { ')', 1 },
             { ']', 2 },
             { '}', 3 },
             { '>', 4 }
-        };
+        });
 
         var incompleteLineScores = new List<long>();
 
