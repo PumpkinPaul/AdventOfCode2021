@@ -11,7 +11,7 @@ public class Day11
         //Console.WriteLine($"Test2: {Part2(test)}"); //
 
         var lines = File.ReadAllLines("Input11.txt");
-        Console.WriteLine($"Part1: {Part1(lines)}"); //
+        Console.WriteLine($"Part1: {Part1(lines)}"); //1691
         //Console.WriteLine($"Part2: {Part2(lines)}"); //
     }
 
@@ -28,46 +28,49 @@ public class Day11
         var total = 0;
 
         var energy = new int[rows][];
-        var points = new List<Point>();
 
         for (int r = 0; r < rows; r++)
         {
             energy[r] = new int[cols];
             for (int c = 0; c < cols; c++)
-            {
                 energy[r][c] = (int)char.GetNumericValue(lines[r].ToArray()[c]);
-                points.Add(new Point(r, c));
-            }
         }
+
+        const int FLASH_THRESHOLD = 10;
 
         //Process the simulation for the desired number of steps
         for (var i = 0; i < 100; i++)
         {
             var flashes = new Stack<Point>();
-            IncreaseEnergy(points, flashes);
+            var allBounds = new AABB(new Point(0, 0), new Point(rows - 1, cols - 1));
+
+            IncreaseEnergy(allBounds, flashes);
 
             //Reset the flashed octopuses back to 0
-            for (int r = 0; r < rows; r++)
+            for (int r = allBounds.Min.Row; r <= allBounds.Max.Row; r++)
             {
-                for (int c = 0; c < cols; c++)
+                for (int c = allBounds.Min.Col; c <= allBounds.Max.Col; c++)
                 {
-                    if (energy[r][c] >= 10)
+                    if (energy[r][c] >= FLASH_THRESHOLD)
                         energy[r][c] = 0;
                 }
             }
         }
 
-        void IncreaseEnergy(IEnumerable<Point> points, Stack<Point> flashes)
+        void IncreaseEnergy(AABB bounds, Stack<Point> flashes)
         {
             //Increase energy by 1
-            foreach (var p in points)
+            for (int r = bounds.Min.Row; r <= bounds.Max.Row; r++)
             {
-                energy[p.Row][p.Col] += 1;
-
-                if (energy[p.Row][p.Col] == 10)
+                for (int c = bounds.Min.Col; c <= bounds.Max.Col; c++)
                 {
-                    flashes.Push(p);
-                    total++;
+                    energy[r][c] += 1;
+
+                    if (energy[r][c] == FLASH_THRESHOLD)
+                    {
+                        flashes.Push(new Point(r, c));
+                        total++;
+                    }
                 }
             }
 
@@ -75,30 +78,32 @@ public class Day11
             {
                 var point = flashes.Pop();
 
-                var adjacentPoints = GetAdjacentPoints(point);
+                var adjacentBounds = GetAdjacentBoundsInclusive(point);
 
-                IncreaseEnergy(adjacentPoints, flashes);
+                IncreaseEnergy(adjacentBounds, flashes);
             }
         }
 
-        IEnumerable<Point> GetAdjacentPoints(Point point)
+        AABB GetAdjacentBoundsInclusive(Point point)
         {
-            return new[]
-            {
-                new { r = -1, c = -1 }, new { r = -1, c = 0 }, new { r = -1, c = 1 },
-                new { r =  0, c = -1 },      /* point */       new { r =  0, c = 1 },
-                new { r =  1, c = -1 }, new { r =  1, c = 0 }, new { r =  1, c = 1 }
-            }
-            .Select(direction => new Point(point.Row + direction.r, point.Col + direction.c))
-            .Where(InBounds);
+            return new AABB(
+                new Point(
+                    Math.Max(point.Row - 1, 0), 
+                    Math.Max(point.Col - 1, 0)
+                ),
+                new Point(
+                    Math.Min(point.Row + 1, rows - 1), 
+                    Math.Min(point.Col + 1, cols - 1)
+                )
+            );
         }
-
-        bool InBounds(Point p) => p.Row >= 0 && p.Row < rows && p.Col >= 0 && p.Col < cols;
 
         return total;
     }
 
     private record struct Point(int Row, int Col);
+
+    private record struct AABB(Point Min, Point Max);
 
     private static long Part2(string[] lines)
     {
