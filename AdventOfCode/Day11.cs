@@ -64,10 +64,12 @@
             IncreaseEnergy(energy, rows, cols, allBounds);
 
             //...reset the flashed octopuses back to 0
-            ProcessEnergyGrid(ref allBounds, (r, c) => { if (energy[r][c] >= FLASH_THRESHOLD) energy[r][c] = 0; });
-
-            //count the simultaneous flashed this step
-            ProcessEnergyGrid(ref allBounds, (r, c) => { if (energy[r][c] == 0) simultaneousFlashCount++; });
+            ProcessEnergyGrid(ref allBounds, (r, c) => {
+                if (energy[r][c] >= FLASH_THRESHOLD) { 
+                    energy[r][c] = 0; 
+                    simultaneousFlashCount++; 
+                } 
+            });
 
             step++;
 
@@ -76,9 +78,9 @@
         return step;
     }
 
+    //Load the puzzle input energy values into a 2d array [rows][cols]
     private static (int[][], int, int) LoadEnergyGrid(string[] lines)
     {
-        //Load the energy values into a 2d array [rows][cols]
         var rows = lines.Length;
         var cols = lines[0].Length;
 
@@ -91,6 +93,7 @@
                 energy[r][c] = (int)char.GetNumericValue(lines[r].ToArray()[c]);
         }
 
+        //Return the energy grid along with the array dimensions
         return (energy, rows, cols);
     }
 
@@ -109,7 +112,8 @@
                 itemAction(r, c);
     }
 
-    //Increases the energy of all cells in the bounds - it's ok to exceed the flash threshold so no need to clamp
+    //Increases the energy of all cells in the grid overlapped by the bounds - it's ok to exceed the flash threshold, no need to clamp
+    //This is a recursive operation - any neighbours of flashed cells will be processed, and then their neighbours, etc
     private static int IncreaseEnergy(int[][] energy, int rows, int cols, Bounds bounds)
     {
         var flashes = 0;
@@ -120,18 +124,25 @@
             if (energy[r][c] != FLASH_THRESHOLD) return;
 
             //Flash this octopus and process neighbours
-            flashes += 1 + IncreaseEnergy(energy, rows, cols, GetAdjacentBoundsInclusive(rows, cols, r, c));
+            flashes += 1 + IncreaseEnergy(energy, rows, cols, GetNeighbourBoundsInclusive(rows, cols, r, c));
         });
 
         return flashes;
     }
 
-    //Pass in a point and get the min and max points respecting the energy array bounds (no IndexOutOfBounds error surprises later)
-    private static Bounds GetAdjacentBoundsInclusive(int rows, int cols, int row, int col) => new(
+    //Pass in a point and get bounds of all direct neighbours (respect the energy size so there are no IndexOutOfBounds error surprises later)
+    //. . . . . . .
+    //. . . . . . . 
+    //. . . . . . . 
+    //. . . . . . . 
+    //. . . . . N N 
+    //. . . . . N P 
+    private static Bounds GetNeighbourBoundsInclusive(int rows, int cols, int row, int col) => new(
         Math.Max(row - 1, 0),
         Math.Max(col - 1, 0),
         Math.Min(row + 1, rows - 1),
         Math.Min(col + 1, cols - 1));
 
+    //Axis-aligned bounding box (AABB)
     private record struct Bounds(int MinRow, int MinCol, int MaxRow, int MaxCol);
 }
