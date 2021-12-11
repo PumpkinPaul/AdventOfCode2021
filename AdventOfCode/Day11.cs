@@ -24,7 +24,7 @@
 
         var totalFlashes = 0;
 
-        var (energy, rows, cols) = Load2DEnergyArray(lines);
+        var (energy, rows, cols) = LoadEnergyGrid(lines);
 
         var allBounds = new Bounds(0, 0, rows - 1, cols - 1);
 
@@ -35,7 +35,7 @@
             totalFlashes += IncreaseEnergy(energy, rows, cols, allBounds);
 
             //...reset the flashed octopuses back to 0
-            ProcessBounds(ref allBounds, (r, c) => { if (energy[r][c] >= FLASH_THRESHOLD) energy[r][c] = 0; });
+            ProcessEnergyGrid(ref allBounds, (r, c) => { if (energy[r][c] >= FLASH_THRESHOLD) energy[r][c] = 0; });
         }
 
         return totalFlashes;
@@ -49,7 +49,7 @@
         //What is the first step during which all octopuses flash?
         //====================================================================================================
 
-        var (energy, rows, cols) = Load2DEnergyArray(lines);
+        var (energy, rows, cols) = LoadEnergyGrid(lines);
 
         var allBounds = new Bounds(0, 0, rows - 1, cols - 1);
 
@@ -64,10 +64,10 @@
             IncreaseEnergy(energy, rows, cols, allBounds);
 
             //...reset the flashed octopuses back to 0
-            ProcessBounds(ref allBounds, (r, c) => { if (energy[r][c] >= FLASH_THRESHOLD) energy[r][c] = 0; });
+            ProcessEnergyGrid(ref allBounds, (r, c) => { if (energy[r][c] >= FLASH_THRESHOLD) energy[r][c] = 0; });
 
             //count the simultaneous flashed this step
-            ProcessBounds(ref allBounds, (r, c) => { if (energy[r][c] == 0) simultaneousFlashCount++; });
+            ProcessEnergyGrid(ref allBounds, (r, c) => { if (energy[r][c] == 0) simultaneousFlashCount++; });
 
             step++;
 
@@ -76,7 +76,7 @@
         return step;
     }
 
-    private static (int[][], int, int) Load2DEnergyArray(string[] lines)
+    private static (int[][], int, int) LoadEnergyGrid(string[] lines)
     {
         //Load the energy values into a 2d array [rows][cols]
         var rows = lines.Length;
@@ -94,7 +94,7 @@
         return (energy, rows, cols);
     }
 
-    //Do something to each item in the bounds
+    //Do something to each item in the grid using the passed bounds
     //Process A         Process B         Process C
     //. . . . . . .     . . . . . . .     . . . . . . .
     //. X X X . . .     . . . . . . .     . . . . . . X     
@@ -102,7 +102,7 @@
     //. X X X . . .     . . . . . . .     . . . . . . X
     //. . . . . . .     . . . . . X X     . . . . . . .
     //. . . . . . .     . . . . . X X     . . . . . . .
-    private static void ProcessBounds(ref Bounds bounds, Action<int, int> itemAction)
+    private static void ProcessEnergyGrid(ref Bounds bounds, Action<int, int> itemAction)
     {
         for (int r = bounds.MinRow; r <= bounds.MaxRow; r++)
             for (int c = bounds.MinCol; c <= bounds.MaxCol; c++)
@@ -113,7 +113,7 @@
     private static int IncreaseEnergy(int[][] energy, int rows, int cols, Bounds bounds)
     {
         var flashes = 0;
-        ProcessBounds(ref bounds, (r, c) =>
+        ProcessEnergyGrid(ref bounds, (r, c) =>
         {
             energy[r][c] += 1;
 
@@ -126,7 +126,7 @@
         return flashes;
     }
 
-    //Pass in a point and get the min and max points respecting the energy array bounds (no IndexOutOfBounds errors surprises later)
+    //Pass in a point and get the min and max points respecting the energy array bounds (no IndexOutOfBounds error surprises later)
     private static Bounds GetAdjacentBoundsInclusive(int rows, int cols, int row, int col) => new(
         Math.Max(row - 1, 0),
         Math.Max(col - 1, 0),
