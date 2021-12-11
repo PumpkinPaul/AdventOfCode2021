@@ -22,10 +22,12 @@ public class Day11
         //How many total flashes are there after 100 steps?
         //====================================================================================================
 
+        const int FLASH_THRESHOLD = 10;
+        var totalFlashes = 0;
+
         //Load the energy values into a 2d array [rows][cols]
         var rows = lines.Length;
         var cols = lines[0].Length;
-        var total = 0;
 
         var energy = new int[rows][];
 
@@ -36,78 +38,70 @@ public class Day11
                 energy[r][c] = (int)char.GetNumericValue(lines[r].ToArray()[c]);
         }
 
-        const int FLASH_THRESHOLD = 10;
-
         //Process the simulation for the desired number of steps
         for (var i = 0; i < 100; i++)
         {
-            var flashes = new Stack<Point>();
-            var allBounds = new AABB(new Point(0, 0), new Point(rows - 1, cols - 1));
+            var allBounds = new Bounds(0, 0, rows - 1, cols - 1);
 
-            IncreaseEnergy(allBounds, flashes);
+            //Increase the energy for each cell in the bounds...
+            IncreaseEnergy(allBounds);
 
-            //Reset the flashed octopuses back to 0
-            for (int r = allBounds.Min.Row; r <= allBounds.Max.Row; r++)
+            //...reset the flashed octopuses back to 0
+            ProcessBounds(ref allBounds, (r, c) =>
             {
-                for (int c = allBounds.Min.Col; c <= allBounds.Max.Col; c++)
-                {
-                    if (energy[r][c] >= FLASH_THRESHOLD)
-                        energy[r][c] = 0;
-                }
-            }
+                if (energy[r][c] >= FLASH_THRESHOLD)
+                    energy[r][c] = 0;
+            });
         }
 
-        void IncreaseEnergy(AABB bounds, Stack<Point> flashes)
+        return totalFlashes;
+
+        //Increases the energy of all cells in the bounds - it's ok to exceed the flash threshold so no need to clamp
+        void IncreaseEnergy(Bounds bounds)
         {
-            //Increase energy by 1
-            for (int r = bounds.Min.Row; r <= bounds.Max.Row; r++)
+            ProcessBounds(ref bounds, (r, c) =>
             {
-                for (int c = bounds.Min.Col; c <= bounds.Max.Col; c++)
-                {
-                    energy[r][c] += 1;
+                energy[r][c] += 1;
 
-                    if (energy[r][c] == FLASH_THRESHOLD)
-                    {
-                        flashes.Push(new Point(r, c));
-                        total++;
-                    }
-                }
-            }
+                if (energy[r][c] != FLASH_THRESHOLD) return;
 
-            while (flashes.Count > 0)
-            {
-                var point = flashes.Pop();
-
-                var adjacentBounds = GetAdjacentBoundsInclusive(point);
-
-                IncreaseEnergy(adjacentBounds, flashes);
-            }
+                //Flash this octopus and process neighbours
+                totalFlashes++;
+                IncreaseEnergy(GetAdjacentBoundsInclusive(r, c));
+            });
         }
 
-        AABB GetAdjacentBoundsInclusive(Point point)
+        //Do something to each item in the bounds
+        //Process A         Process B         Process C
+        //. . . . . . .     . . . . . . .     . . . . . . .
+        //. X X X . . .     . . . . . . .     . . . . . . X     
+        //. X X X . . .     . . . . . . .     . . . . . . X
+        //. X X X . . .     . . . . . . .     . . . . . . X
+        //. . . . . . .     . . . . . X X     . . . . . . .
+        //. . . . . . .     . . . . . X X     . . . . . . .
+        void ProcessBounds(ref Bounds bounds, Action<int, int> itemAction)
         {
-            return new AABB(
-                new Point(
-                    Math.Max(point.Row - 1, 0), 
-                    Math.Max(point.Col - 1, 0)
-                ),
-                new Point(
-                    Math.Min(point.Row + 1, rows - 1), 
-                    Math.Min(point.Col + 1, cols - 1)
-                )
-            );
+            for (int r = bounds.MinRow; r <= bounds.MaxRow; r++)
+                for (int c = bounds.MinCol; c <= bounds.MaxCol; c++)
+                    itemAction(r, c);
         }
 
-        return total;
+        //Pass in a point and get the min and max points respecting the energy array bounds (no IndexOutOfBounds errors surprises later)
+        Bounds GetAdjacentBoundsInclusive(int row, int col) => new(
+            Math.Max(row - 1, 0),
+            Math.Max(col - 1, 0),
+            Math.Min(row + 1, rows - 1),
+            Math.Min(col + 1, cols - 1));
     }
 
-    private record struct Point(int Row, int Col);
-
-    private record struct AABB(Point Min, Point Max);
+    private record struct Bounds(int MinRow, int MinCol, int MaxRow, int MaxCol);
 
     private static long Part2(string[] lines)
     {
         //====================================================================================================
+        //If you can calculate the exact moments when the octopuses will all flash
+        //simultaneously, you should be able to navigate through the cavern.
+        //What is the first step during which all octopuses flash?
         //====================================================================================================
 
         return 0;
