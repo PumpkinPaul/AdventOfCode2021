@@ -4,13 +4,13 @@
     {
         Console.WriteLine("--- Day 13: Transparent Origami ---");
 
-        var test = File.ReadAllLines("Test13.txt");
+        //var test = File.ReadAllLines("Test13.txt");
         //Console.WriteLine($"Test1(1): {Part1(test)}"); //17
-        Part2(test); //
+        //Part2(test);
 
         var lines = File.ReadAllLines("Input13.txt");
         //Console.WriteLine($"Part1: {Part1(lines)}"); //701
-        //Part2(lines); //
+        Part2(lines);
     }
 
     public static long Part1(string[] lines)
@@ -41,7 +41,7 @@
 
         var foldedGrid = Fold2(grid, folds);
 
-        //DisplayResults(foldedGrid);
+        DisplayResults(foldedGrid);
 
         return 0;
     }
@@ -141,7 +141,7 @@
 
                 //Get the sizes of the paper to the top and bottom of the fold
                 var topRows = foldValue;
-                var bottomRows = sourceGrid.Length - topRows - 1;
+                var bottomRows = sourceRows - topRows - 1;
 
                 newRows = Math.Max(topRows, bottomRows);
 
@@ -159,23 +159,23 @@
                 else if (topRows > bottomRows)
                 {
                     sTop = 0;
-                    sBottom = topRows + 1;
+                    sBottom = sourceRows - 1;
 
                     dTop = 0;
-                    dBottom = sourceRows - topRows;
+                    dBottom = topRows - bottomRows;
                 }
                 else
                 {
                     sTop = 0;
-                    sBottom = topRows + 1;
+                    sBottom = sourceRows - 1;
 
                     dTop = 0;
                     dBottom = 0;
                 }
 
                 //Blit both sides from the source grid to the correct locations in the foldedGrid
-                BlitGrid(sourceGrid, 0, sTop, foldedGrid, 0, dTop, newRows, topRows, 1, 1);
-                BlitGrid(sourceGrid, 0, sBottom, foldedGrid, 0, dBottom, newRows, bottomRows, 1, -1);
+                BlitGrid(sourceGrid, 0, sTop, foldedGrid, 0, dTop, topRows, newCols, 1, 1);
+                BlitGrid(sourceGrid, 0, sBottom, foldedGrid, 0, dBottom, bottomRows, newCols, 1, -1);
             }
             else
             {
@@ -186,7 +186,7 @@
 
                 //Get the sizes of the paper to the left and right of the fold
                 var leftCols = foldValue;
-                var rightCols = sourceGrid[0].Length - foldValue;
+                var rightCols = sourceCols - leftCols - 1;
 
                 newCols = Math.Max(leftCols, rightCols);
 
@@ -204,15 +204,15 @@
                 if (leftCols > rightCols)
                 {
                     sLeft = 0;
-                    sRight = leftCols + 1;
+                    sRight = sourceCols - 1;
 
                     dLeft = 0;
-                    dRight = sourceCols - rightCols;
+                    dRight = leftCols - rightCols;
                 }
                 else
                 {
                     sLeft = 0;
-                    sRight = leftCols + 1;
+                    sRight = sourceCols - 1;
 
                     dLeft = 0;
                     dRight = 0;
@@ -222,8 +222,6 @@
                 BlitGrid(sourceGrid, sLeft, 0, foldedGrid, dLeft, 0, newRows, leftCols, 1, 1);
                 BlitGrid(sourceGrid, sRight, 0, foldedGrid, dRight, 0, newRows, rightCols, -1, 1);
             }
-
-            DisplayResults(foldedGrid);
 
             static void BlitGrid(int[][] source, int sx, int sy, int[][] dest, int dx, int dy, int rows, int cols, int stepX, int stepY)
             {
