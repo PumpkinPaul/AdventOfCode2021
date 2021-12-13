@@ -27,9 +27,7 @@
 
         //Count the dots
         var dots = 0;
-        for (var r = 0; r < rows; r++)
-            for (var c = 0; c < cols; c++)
-                if (foldedGrid[r][c] > 0) dots++;
+        ProcessGrid(foldedGrid, (r, c) => { if (foldedGrid[r][c] > 0) dots++; });
 
         return dots;
     }
@@ -44,7 +42,10 @@
 
         var foldedGrid = FoldGrid(grid, folds);
 
-        DisplayResults(foldedGrid);
+        ProcessGrid(
+            foldedGrid, 
+            (r, c) => Console.Write(foldedGrid[r][c] > 0 ? '#' : '.'),
+            () => Console.WriteLine());
 
         return 0;
     }
@@ -191,26 +192,17 @@
 
     private static (int, int) GetGridDimensions(int[][] grid) => (grid.Length, grid[0].Length);
 
-    private static void DisplayResults(int[][] grid)
+    private static void ProcessGrid(int[][] grid, Action<int, int> cellProcessor, Action rowProcessor = null)
     {
-        var rows = grid.Length;
-        var cols = grid[0].Length;
+        var (rows, cols) = GetGridDimensions(grid);
 
-        //Display the results
         for (var r = 0; r < rows; r++)
         {
             for (var c = 0; c < cols; c++)
-            {
-                if (grid[r][c] > 0)
-                    Console.Write('#');
-                else
-                    Console.Write('.');
-            }
+                cellProcessor(r, c);
 
-            Console.WriteLine();
+            rowProcessor?.Invoke();
         }
-
-        Console.WriteLine();
     }
 
     private readonly record struct Point(int X, int Y)
