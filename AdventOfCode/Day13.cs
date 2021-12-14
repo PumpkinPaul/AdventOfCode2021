@@ -98,13 +98,17 @@
             var (sourceRows, sourceCols) = GetGridDimensions(sourceGrid);
             var (newRows, newCols) = (sourceRows, sourceCols);
 
+            var sourceTop = 0;
+            var sourceLeft = 0;
+
+            var destinationTop = 0;
+            var destinationBottom = 0;
+            var destinationLeft = 0;
+            var destinationRight = 0;
+
             if (foldDimension == "y")
             {
-                var sourceTop = 0;
                 var sourceBottom = sourceRows - 1;
-                
-                var destinationTop = 0;
-                var destinationBottom = 0;
 
                 //Get the sizes of the paper to the top and bottom of the fold
                 var topRows = foldValue;
@@ -126,11 +130,7 @@
             }
             else
             {
-                var sourceLeft = 0;
                 var sourceRight = sourceCols - 1;
-
-                var destinationLeft = 0;
-                var destinationRight = 0;
 
                 //Get the sizes of the paper to the left and right of the fold
                 var leftCols = foldValue;
@@ -180,7 +180,7 @@
 
     private static (int, int) GetGridDimensions(int[][] grid) => (grid.Length, grid[0].Length);
 
-    private static void ProcessGrid(int[][] grid, Action<int, int> cellProcessor, Action rowProcessor = null)
+    private static void ProcessGrid(int[][] grid, Action<int, int> cellProcessor, Action? rowProcessor = null)
     {
         var (rows, cols) = GetGridDimensions(grid);
 
