@@ -5,59 +5,47 @@
         Console.WriteLine("--- Day 14: Extended Polymerization ---");
 
         var test = File.ReadAllLines("Test14.txt");
-        //Console.WriteLine($"Test1(1): {Part1(test)}"); //17
-        //Part2(test);                                   //O
+        Console.WriteLine($"Test1: {Part1(test)}"); //1588
+        Console.WriteLine($"Test2: {Part2(test)}"); //2188189693529
 
         var lines = File.ReadAllLines("Input14.txt");
-        Console.WriteLine($"Part1: {Part1(lines)}"); //701
-        //Console.WriteLine($"Part1: {Part2(lines)}"); //701
+        Console.WriteLine($"Part1: {Part1(lines)}"); //2112
+        Console.WriteLine($"Part2: {Part2(lines)}"); //3243771149914
     }
 
-    public static long Part1(string[] lines)
-    {
-        //====================================================================================================
-        //Apply 10 steps of pair insertion to the polymer template and find the most
-        //and least common elements in the result. What do you get if you take the
-        //quantity of the most common element and subtract the quantity of the least
-        //common element?
-        //====================================================================================================
+    public static long Part1(string[] lines) => Solve(lines, 10);
 
+    public static long Part2(string[] lines) => Solve(lines, 40);
+
+    //====================================================================================================
+    //Apply X steps of pair insertion to the polymer template and find the most
+    //and least common elements in the result. What do you get if you take the
+    //quantity of the most common element and subtract the quantity of the least
+    //common element?
+    //====================================================================================================
+    private static long Solve(string[] lines, int steps)
+    { 
         var (polymer, rules) = Load(lines);
 
-        var p = polymer;
-        for (var i= 0; i < 10; i++)
+        var counts = new Counter<char>(polymer);
+        var pairs = new Counter<(char, char)>(Pairwise(polymer));
+
+        for (var i = 0; i < steps; i++)
         {
-            p = polymer;
-            while (p.Next != null)
+            foreach (var ((left, right), count) in pairs.Items.ToArray())
             {
-                var n = p.Next;
-                var pair = $"{p.Value}{p.Next.Value}";
-                var rule = rules[pair];
+                var result = rules[(left, right)];
 
-                p.List?.AddAfter(p, rule);
-                p = n;
+                // These pairs are created in one step
+                pairs[(left, result)] += count;
+
+                pairs[(result, right)] += count;
+                //The original pair is broken in one step
+                pairs[(left, right)] -= count;
+
+                //Add to current count of the new element
+                counts[result] += count;
             }
-
-        }
-
-        p = polymer;
-        while (p != null)
-        {
-            Console.Write(p.Value);
-            p = p.Next;
-        }
-
-        var counts = new Dictionary<char, int>();
-
-        p = polymer;
-        while (p != null)
-        {
-            if (counts.ContainsKey(p.Value) == false)
-                counts[p.Value] = 0;
-
-            counts[p.Value]++;
-
-            p = p.Next;
         }
 
         var max = counts.Values.Max();
@@ -66,25 +54,40 @@
         return max - min;
     }
 
-    public static long Part2(string[] lines)
+    private static (string, Dictionary<(char, char), char>) Load(string[] lines)
     {
-        //====================================================================================================
-        //
-        //====================================================================================================
+        var polymer = lines[0];
+        var rules = lines.Skip(2)
+            .ToDictionary(line => (line.Split(" -> ")[0][0], line.Split(" -> ")[0][1]), line => char.Parse(line.Split(" -> ")[1]));
 
-        return 0;
+        return (polymer, rules);
     }
 
-    private static (LinkedListNode<char>, Dictionary<string, char>) Load(string[] lines)
+    private class Counter<T> where T : notnull
     {
-        var polymer = new LinkedList<char>();
-        var p = lines[0];
-        polymer.AddFirst(p[0]);
-        for (int i = 1; i < p.Length; i++)
-            polymer.AddLast(p[i]);
+        private readonly Dictionary<T, long> _data = new();
 
-        var rules = lines.Skip(2).ToDictionary(line => line.Split(" -> ")[0], line => char.Parse(line.Split(" -> ")[1]));
+        public Counter(IEnumerable<T> source)
+        {
+            foreach (var item in source)
+                this[item] += 1;
+        }
 
-        return (polymer.First, rules);
+        public long this[T key]
+        {
+            get { _data.TryGetValue(key, out var count); return count; }
+            set => _data[key] = value;
+        }
+
+        public IEnumerable<T> Keys => _data.Keys;
+        public IEnumerable<long> Values => _data.Values;
+
+        public IEnumerable<(T, long)> Items => _data.Select(kvp => (kvp.Key, kvp.Value));
+    }
+
+    private static IEnumerable<(T, T)> Pairwise<T>(IEnumerable<T> source)
+    {
+        for (int i = 0; i < source.Count() - 1; i++)
+            yield return (source.ElementAt(i), source.ElementAt(i + 1));
     }
 }

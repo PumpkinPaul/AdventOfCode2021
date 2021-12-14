@@ -5,7 +5,7 @@
         Console.WriteLine("--- Day 13: Transparent Origami ---");
 
         //var test = File.ReadAllLines("Test13.txt");
-        //Console.WriteLine($"Test1(1): {Part1(test)}"); //17
+        //Console.WriteLine($"Test1: {Part1(test)}"); //17
         //Part2(test);                                   //O
 
         var lines = File.ReadAllLines("Input13.txt");
