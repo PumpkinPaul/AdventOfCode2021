@@ -82,6 +82,7 @@
         }
 
         public IEnumerable<T> Keys => _data.Keys;
+
         public IEnumerable<long> Values => _data.Values;
 
         public IEnumerable<(T, long)> Items => _data.Select(kvp => (kvp.Key, kvp.Value));
