@@ -57,8 +57,10 @@
     private static (string, Dictionary<(char, char), char>) Load(string[] lines)
     {
         var polymer = lines[0];
-        var rules = lines.Skip(2)
-            .ToDictionary(line => (line.Split(" -> ")[0][0], line.Split(" -> ")[0][1]), line => char.Parse(line.Split(" -> ")[1]));
+        var rules = lines
+            .Skip(2)
+            .Select(line => line.Split(" -> "))
+            .ToDictionary(parts => (parts[0][0], parts[0][1]), parts => char.Parse(parts[1]));
 
         return (polymer, rules);
     }
